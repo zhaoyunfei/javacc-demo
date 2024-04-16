@@ -1,0 +1,37 @@
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+
+spring:
+  # 打开日志颜色输出
+  output:
+    ansi:
+      enabled: detect
+  profiles:
+    active: dev
+  jmx:
+    enabled: false
+
+
+# 日志配置
+logging:
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %5level [%15thread] %-50.50(%logger{39}.%method:%-3line) - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %yellow(%5level) [%15thread] %cyan(%-50.50(%logger{39}.%method:%-3line)) - %msg%n"
+  file:
+    name: ./logs/javacc-demo/javacc-demo.log
+  level:
+    com.zhaoyunfei.javacc: debug
+
+# 上传大小配置
+multipart:
+  maxRequestSize: 100MB
+  maxFileSize: 100MB
+
+storage:
+  ip: 127.0.0.1
+  port: 8080
+  address: /home/kilox/robot
+  win-address: D:/test/cooperation
