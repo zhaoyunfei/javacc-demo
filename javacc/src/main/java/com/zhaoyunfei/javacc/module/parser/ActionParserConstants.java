@@ -21,39 +21,49 @@ public interface ActionParserConstants {
   /** RegularExpression Id. */
   int FOR = 10;
   /** RegularExpression Id. */
-  int DO = 11;
+  int WHILE = 11;
   /** RegularExpression Id. */
-  int END = 12;
+  int BREAK = 12;
   /** RegularExpression Id. */
-  int THEN = 13;
+  int CONTINUE = 13;
   /** RegularExpression Id. */
-  int PTP = 14;
+  int CONTINUE_END = 14;
   /** RegularExpression Id. */
-  int LIN = 15;
+  int DO = 15;
   /** RegularExpression Id. */
-  int ARC = 16;
+  int END = 16;
   /** RegularExpression Id. */
-  int CIRCLE = 17;
+  int THEN = 17;
   /** RegularExpression Id. */
-  int LESSTHAN = 18;
+  int PTP = 18;
   /** RegularExpression Id. */
-  int LESSTHANOREQUAL = 19;
+  int LIN = 19;
   /** RegularExpression Id. */
-  int GREATERTHAN = 20;
+  int ARC = 20;
   /** RegularExpression Id. */
-  int GREATERTHANOREQUAL = 21;
+  int CIRCLE = 21;
   /** RegularExpression Id. */
-  int EQUALTO = 22;
+  int LESSTHAN = 22;
   /** RegularExpression Id. */
-  int EQUAL = 23;
+  int LESSTHANOREQUAL = 23;
   /** RegularExpression Id. */
-  int NOTEQUAL = 24;
+  int GREATERTHAN = 24;
   /** RegularExpression Id. */
-  int TRUE = 25;
+  int GREATERTHANOREQUAL = 25;
   /** RegularExpression Id. */
-  int FALSE = 26;
+  int EQUALTO = 26;
   /** RegularExpression Id. */
-  int IDENTIFIER = 27;
+  int EQUAL = 27;
+  /** RegularExpression Id. */
+  int ADD = 28;
+  /** RegularExpression Id. */
+  int NOTEQUAL = 29;
+  /** RegularExpression Id. */
+  int TRUE = 30;
+  /** RegularExpression Id. */
+  int FALSE = 31;
+  /** RegularExpression Id. */
+  int IDENTIFIER = 32;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -71,6 +81,10 @@ public interface ActionParserConstants {
     "\",\"",
     "\"if\"",
     "\"for\"",
+    "\"while\"",
+    "\"break\"",
+    "\"goto continue\"",
+    "\"::continue::\"",
     "\"do\"",
     "\"end\"",
     "\"then\"",
@@ -84,6 +98,7 @@ public interface ActionParserConstants {
     "\"\\u2265\"",
     "\"=\"",
     "\"==\"",
+    "\"+\"",
     "\"\\u2260\"",
     "\"true\"",
     "\"false\"",

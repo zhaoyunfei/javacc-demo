@@ -28,7 +28,7 @@ public class LuaScriptServiceImpl implements ILuaScriptService {
         try {
             InputStream inputStream = ResourceUtil.getStream("classpath:/static/1.lua");
             ActionParser parser=new ActionParser(inputStream,iExecuteService);
-            parser.Start();
+            parser.start();
             return true;
         }catch (Exception e){
             throw new CustomException("解析执行脚本失败,失败原因:"+e.getMessage());
