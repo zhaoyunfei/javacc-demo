@@ -33,6 +33,32 @@ for c=0,2,1 do
  PTP(100,100,0,0,0,0,0,0,0,0)
  Lin(测试2,100,0,0,0,0,0,0,0,0)
 end
+
+
+for c=1,2 do
+ PTP(100,100,0,0,0,0,0,0,0,0)
+ if c==1 then
+     Lin(100,100,0,0,0,0,0,0,0,0)
+     for i=1,3 do
+         if i==1 then
+             Circle(圆1,100,0,0,0,0,0,0,0,0)
+            goto continue
+         end
+          Circle(圆,100,0,0,0,0,0,0,0,0)
+     end
+    ::continue::
+ end
+ ARC(测试2,100,0,0,0,0,0,0,0,0)
+end
+
+d=1
+while(d<3) do
+    if d==1 then
+        PTP(while11,100,0,0,0,0,0,0,0,0)
+        break
+    end
+  d=d+1
+end
 ```
 其中,for c=0,2,1 do end 代表for循环,从0开始到2结束(不包含2)每次递增1 <br>
 if a>b then end 代表if条件语句<br>
