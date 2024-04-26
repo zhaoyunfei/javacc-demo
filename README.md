@@ -2,7 +2,7 @@
 ## 1.背景
   项目需求为,前端引入blocky框架实现可视化编程功能,后端需要根据前端生成的脚本(协商后定位lua脚本)通过语言解析器,<span style="color: red;">解析并执行</span>脚本内容.其中包括if,for,声明,执行动作等,还要求可以嵌套执行.
 ## 2.框架
-  项目框架为 springboot2.3.2.解析器为 javacc.<br>
+  项目框架为 jdk1.8+springboot2.3.2.解析器为 javacc.<br>
   语言解析器请先去javacc官网:https://javacc.github.io/javacc/ 学习基本语法与词义<br>
   javacc其实就是通过特定的语法结构转换成可执行的java代码,因此核心点就在于javacc的语法也就是书写符合规则的.jj文件
 ## 3.脚本内容
