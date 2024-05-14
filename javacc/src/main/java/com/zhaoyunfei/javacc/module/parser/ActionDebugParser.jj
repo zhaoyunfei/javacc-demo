@@ -9,7 +9,8 @@ options {
 
 }
 
-PARSER_BEGIN(ActionParser)
+PARSER_BEGIN(ActionDebugParser)
+import com.zhaoyunfei.javacc.exceptions.CustomException;
 import com.zhaoyunfei.javacc.module.dto.ARCActionDto;
 import com.zhaoyunfei.javacc.module.dto.CircleActionDto;
 import com.zhaoyunfei.javacc.module.dto.LineActionDto;
@@ -23,133 +24,169 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
-public class ActionParser {
+public class ActionDebugParser {
 
 	private int currentLine=0;
 	// 业务接口
     private IExecuteService iExecuteService;
-
+	
 	private boolean breakLoop=false;
-
+	
 	private boolean continueLoop=false;
-
+	
 	private ParsingListener parsingListener;
-
+	
 	private final AtomicBoolean paused = new AtomicBoolean(false);
-
+	
     private final AtomicBoolean stopped = new AtomicBoolean(false);
+	
+	// 当前行数状态:0-执行中,1-执行成功,2-执行失败
+	private int status=0;
 
         // 存储变量�? Map
     private final Map<String, Float> variables = new HashMap<String, Float>();
-
+	
     private boolean executePtpAction(String parameters) {
         log.debug("Executing PTP action with parameters: " + parameters);
 		// 分割参数
         String[] split = parameters.split(",");
-
+		
         String param1 =split.length>0? split[0]:"";
-
+		
         float param2 =split.length>1? Float.parseFloat(split[1]):0;
-
+		
         float param3 =split.length>2? Float.parseFloat(split[2]):0;
-
+		
         int param4 =split.length>3? Integer.parseInt(split[3]):0;
 
         float param5 =split.length>4? Float.parseFloat(split[4]):0;
-
+		
         float param6 =split.length>5? Float.parseFloat(split[5]):0;
-
+		
         float param7 =split.length>6? Float.parseFloat(split[6]):0;
-
+		
         float param8 =split.length>7? Float.parseFloat(split[7]):0;
-
+		
         float param9 =split.length>8? Float.parseFloat(split[8]):0;
-
+		
         float param10 =split.length>9? Float.parseFloat(split[9]):0;
 
         PTPActionDto dto = new PTPActionDto(param1, param2, param3, param4, param5, param6, param7, param8, param9, param10);
         // 执行 PTP 动作
-        return this.iExecuteService.executePtpAction(dto);
+		try{
+			boolean b= this.iExecuteService.executePtpAction(dto);
+			parsingListener.onParsingRead(currentLine,1);
+			breakpoint();
+			return b;
+		}catch(Exception e){
+			parsingListener.onParsingRead(currentLine,2);
+			throw new CustomException("执行圆弧运动失败,失败原因:"+e.getMessage());
+		}
+        
     }
 
     private boolean executeLinAction(String parameters) {
         log.debug("Executing LIN action with parameters: " + parameters);
 		// 分割参数
         String[] split = parameters.split(",");
-
+        
         String param1 =split.length>0? split[0]:"";
-
+        
         float param2 =split.length>1? Float.parseFloat(split[1]):0;
-
+        
         float param3 =split.length>2? Float.parseFloat(split[2]):0;
-
+       
         int param4 =split.length>3? Integer.parseInt(split[3]):0;
-
+        
         int param5 =split.length>4? Integer.parseInt(split[4]):0;
 
         float param6 =split.length>5? Float.parseFloat(split[5]):0;
-
+		
         float param7 =split.length>6? Float.parseFloat(split[6]):0;
-
+		
         float param8 =split.length>7? Float.parseFloat(split[7]):0;
-
+		
         float param9 =split.length>8? Float.parseFloat(split[8]):0;
-
+		
         float param10 =split.length>9? Float.parseFloat(split[9]):0;
-
+		
         float param11 =split.length>10? Float.parseFloat(split[10]):0;
 
         LineActionDto dto = new LineActionDto(param1, param2, param3, param4, param5, param6, param7, param8, param9, param10, param11);
         // 执行 LIN动作
-        return this.iExecuteService.executeLinAction(dto);
+		try{
+			boolean b= this.iExecuteService.executeLinAction(dto);
+			parsingListener.onParsingRead(currentLine,1);
+			breakpoint();
+			return b;
+		}catch(Exception e){
+			parsingListener.onParsingRead(currentLine,2);
+			throw new CustomException("执行圆弧运动失败,失败原因:"+e.getMessage());
+		}
     }
 
     private boolean executeArcAction(String parameters) {
         log.debug("Executing ARC action with parameters: " + parameters);
 		// 分割参数
         String[] split = parameters.split(",");
-
-        String param1 =split.length>0? split[0]:"";
-
+       
+        String param1 =split.length>0? split[0]:""; 
+       
         String param2 =split.length>1? split[1]:"";
-
+		
         int param3 =split.length>2? Integer.parseInt(split[2]):0;
-
+   
         float param4 =split.length>3? Float.parseFloat(split[3]):0;
 
 		ARCActionDto dto=new ARCActionDto(param1,param2,param3,param4);
         // 执行 ARC 动作
-        return this.iExecuteService.executeArcAction(dto);
+		try{
+			boolean b= this.iExecuteService.executeArcAction(dto);
+			parsingListener.onParsingRead(currentLine,1);
+			breakpoint();
+			return b;
+		}catch(Exception e){
+			parsingListener.onParsingRead(currentLine,2);
+			throw new CustomException("执行圆弧运动失败,失败原因:"+e.getMessage());
+		}
     }
 
     private boolean executeCircleAction(String parameters) {
         log.debug("Executing CIRCLE action with parameters: " + parameters);
 		// 根据规则分割参数
         String[] split = parameters.split(",");
-
+        
         String param1 =split.length>0? split[0]:"";
-
+		
         String param2 =split.length>1? split[1]:"";
 
         int param3 =split.length>2? Integer.parseInt(split[2]):0;
-
+        
         int param4 =split.length>3? Integer.parseInt(split[3]):0;
 
         float param5 =split.length>4? Float.parseFloat(split[4]):0;
-
+		
         float param6 =split.length>5? Float.parseFloat(split[5]):0;
-
+		
         float param7 =split.length>6? Float.parseFloat(split[6]):0;
-
+		
         float param8 =split.length>7? Float.parseFloat(split[7]):0;
-
+		
         float param9 =split.length>8? Float.parseFloat(split[8]):0;
-
+		
         float param10 =split.length>9? Float.parseFloat(split[9]):0;
 
         CircleActionDto dto = new CircleActionDto(param1, param2, param3, param4, param5, param6, param7, param8, param9, param10);
         // 执行 CIRCLE动作
-        return this.iExecuteService.executeCircleAction(dto);
+		try{
+			boolean b= this.iExecuteService.executeCircleAction(dto);
+			parsingListener.onParsingRead(currentLine,1);
+			breakpoint();
+			return b;
+		}catch(Exception e){
+			parsingListener.onParsingRead(currentLine,2);
+			throw new CustomException("执行圆弧运动失败,失败原因:"+e.getMessage());
+		}
     }
 	public void pause() {
         paused.set(true);
@@ -165,8 +202,18 @@ public class ActionParser {
     public void stop() {
         stopped.set(true);
     }
+	
+	public void breakpoint(){
+		try {
+			synchronized (paused) {
+				paused.wait();
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+	}
 }
-PARSER_END(ActionParser)
+PARSER_END(ActionDebugParser)
 
 SKIP : {
   " " | "\t" | "\n" | "\r"
@@ -176,7 +223,7 @@ TOKEN : {
   <NUMBER: ("-")? (["0"-"9"])+ | ("-")? (["0"-"9"])+ "." (["0"-"9"])+ >
 | <LPAREN: "(" >
 | <RPAREN: ")" >
-| <COMMA: "," >
+| <COMMA: "," > 
 | <IF: "if" >
 | <FOR: "for" >
 | <WHILE: "while" >
@@ -204,7 +251,7 @@ TOKEN : {
 }
 
 void start() :
-{}
+{} 
 {
    statement() ( statement())*
 }
@@ -226,7 +273,7 @@ void noExecStatement() :
 // 条件中: if,for循环,变量声明
 void conditionalStatement() :
 {}
-{
+{	
 {
 		if(stopped.get()){
 			noExecStatement();
@@ -240,7 +287,6 @@ void conditionalStatement() :
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new ParseException("Thread interrupted while paused"+ token);
             }
         }
     }
@@ -259,6 +305,7 @@ void declaration() :
 	Token varName, symbol, value1,value2;
 }
 {
+	{currentLine=token.beginLine;parsingListener.onParsingRead(currentLine,0);}
 	varName = <IDENTIFIER>
 	symbol = <EQUALTO>
 	(
@@ -270,7 +317,7 @@ void declaration() :
 				variables.put(name, val1);
 			}
 			|
-			value1 = <IDENTIFIER>
+			value1 = <IDENTIFIER> 
 			symbol = <ADD>
 			value2 = <NUMBER>
 			{
@@ -285,7 +332,7 @@ void declaration() :
 				variables.put(variableName,result);
 			}
 		)
-		{currentLine=token.endLine;parsingListener.onParsingRead(currentLine);}
+		{currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1); breakpoint(); }
 	)
 }
 
@@ -300,17 +347,18 @@ void ifStatement() :
 {
   boolean conditionResult;
 }
-{
+{ 
   {
 	  if (breakLoop|continueLoop) {
 		noExecStatement();
 		return;
 	  }
   }
-  <IF>
+  {currentLine=token.beginLine;parsingListener.onParsingRead(currentLine,0);}
+  <IF> 
   conditionResult = condition()
   <THEN>
-	{currentLine=token.endLine;parsingListener.onParsingRead(currentLine);}
+	{currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();}  
     {
       if (conditionResult) {
        ifConditionStatement();
@@ -323,11 +371,11 @@ void ifStatement() :
 		return;
 	   }
       }else{
-		noExecStatement();
+		noExecStatement(); 
 	  }
     }
   (<END>
-  		{currentLine=token.endLine;parsingListener.onParsingRead(currentLine);})?
+  		{currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();})?
 
 }
 
@@ -336,8 +384,8 @@ void ifConditionStatement() :
 {
   (statement()
   |
-  (<BREAK>{ breakLoop = true; currentLine=token.endLine;parsingListener.onParsingRead(currentLine);})
-  |(<CONTINUE> {this.continueLoop=true;currentLine=token.endLine;parsingListener.onParsingRead(currentLine);}))*
+  (<BREAK>{ breakLoop = true; currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();})
+  |(<CONTINUE> {this.continueLoop=true;currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();}))*
 }
 
 void noExecIfStatement() :
@@ -364,14 +412,15 @@ void forStatement() :
   Token[] savedTokens = new Token[1];
 }
 {
-  <FOR> <IDENTIFIER>{ identy = token.image; } <EQUALTO>
+  {currentLine=token.beginLine;parsingListener.onParsingRead(currentLine,0);}
+  <FOR> <IDENTIFIER>{ identy = token.image; } <EQUALTO> 
   <NUMBER> { start = Integer.parseInt(token.image);  variables.put(identy,(float)start);}
   <COMMA> <NUMBER> { end = Integer.parseInt(token.image); }
   (
 	(
 	  <COMMA> <NUMBER> { increment = Integer.parseInt(token.image); }
 	  <DO>
-	  {currentLine=token.endLine;parsingListener.onParsingRead(currentLine);}
+	  {currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();}
 	  { savedTokens[0] = token;}
 	  // 循环体开始
 	  {
@@ -399,14 +448,14 @@ void forStatement() :
 			continueLoop=false;
 			continue;
 		  }
-
+		  
 		}
 	  }
 	)
 	|
 	(
 	  <DO>
-	  {currentLine=token.endLine;parsingListener.onParsingRead(currentLine);}
+	  {currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();}
 	  { savedTokens[0] = token;}
 	  // 循环体开始
 	  {
@@ -438,9 +487,9 @@ void forStatement() :
 	  }
 	)
   )
-
+  
   (<END>
-  		{currentLine=token.endLine;parsingListener.onParsingRead(currentLine);})?
+  		{currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();})?
 }
 
 void whileStatement() :
@@ -449,12 +498,13 @@ void whileStatement() :
     Token[] savedTokens = new Token[1]; // 用于保存当前解析位置的数组
 }
 {
-    <WHILE>
+	{currentLine=token.beginLine;parsingListener.onParsingRead(currentLine,0);}
+    <WHILE> 
     <LPAREN>
 	{ savedTokens[0] = token;} // 保存当前解析位置
     conditionResult = condition()
     <RPAREN> <DO>
-	{currentLine=token.endLine;parsingListener.onParsingRead(currentLine);}
+	{currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();}
     {
        while(conditionResult){
 			if(stopped.get()){
@@ -463,12 +513,12 @@ void whileStatement() :
 			}
 			forConditionStatement();
 			// 还原 token 流到上一个循环迭代之前的状态
-		  token = savedTokens[0];
+		  token = savedTokens[0]; 
 		   jj_ntk=-1;
 		  conditionResult = condition(); // 重新解析条件
 		  jj_consume_token(RPAREN);
 		  jj_consume_token(DO);
-
+		  
 		  		  if(breakLoop){
 			noExecStatement();
 			breakLoop=false;
@@ -485,16 +535,16 @@ void whileStatement() :
 	   }
     }
    (<END>
-  		{currentLine=token.endLine;parsingListener.onParsingRead(currentLine);})?
+  		{currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();})?
 }
 
 void forConditionStatement() :
 {}
 {
-	(statement()
-	|
-	(<BREAK> { this.breakLoop = true;currentLine=token.endLine;parsingListener.onParsingRead(currentLine);})
-	|(<CONTINUE> {this.continueLoop=true;currentLine=token.endLine;parsingListener.onParsingRead(currentLine);}))*
+	(statement() 
+	| 
+	(<BREAK> { this.breakLoop = true;currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();}) 
+	|(<CONTINUE> {this.continueLoop=true;currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();}))*
 }
 
 
@@ -514,7 +564,7 @@ void noExecContinueStatement() :
 void continueEnd() :
 {}
 {
-	<CONTINUE_END> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine);}
+	<CONTINUE_END> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine,1);breakpoint();}
 }
 
 void noExecLoopStatement() :
@@ -587,7 +637,7 @@ void noExecAction() :
 boolean ptpAction() :
 {}
 {
-  <PTP> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine); return executePtpAction(parameters());}
+  <PTP> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine,0); return executePtpAction(parameters());}
 }
 
 void noExecPtpAction() :
@@ -599,7 +649,7 @@ void noExecPtpAction() :
 boolean linAction() :
 {}
 {
-  <LIN> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine);return executeLinAction(parameters()); }
+  <LIN> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine,0);return executeLinAction(parameters()); }
 }
 
 void noExecLinAction() :
@@ -611,7 +661,7 @@ void noExecLinAction() :
 boolean arcAction() :
 {}
 {
-  <ARC> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine); return executeArcAction(parameters()); }
+  <ARC> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine,0); return executeArcAction(parameters()); }
 }
 
 void noExecArcAction() :
@@ -623,7 +673,7 @@ void noExecArcAction() :
 boolean circleAction() :
 {}
 {
-  <CIRCLE> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine);return executeCircleAction(parameters()); }
+  <CIRCLE> {currentLine=token.endLine;parsingListener.onParsingRead(currentLine,0);return executeCircleAction(parameters()); }
 }
 
 void noExecCircleAction() :
@@ -683,38 +733,38 @@ boolean condition() :
     (
       (
         t1 = <IDENTIFIER>
-      )
-      |
-      (t1 = <NUMBER>)
+      ) 
+      | 
+      (t1 = <NUMBER>) 
     )
     (op = <LESSTHAN> | op = <LESSTHANOREQUAL> | op = <GREATERTHAN> | op = <GREATERTHANOREQUAL> | op = <EQUAL> | op = <NOTEQUAL>)
     (
       (
         t2 = <IDENTIFIER>
-      )
-      |
-      (t2 = <NUMBER>)
+      ) 
+      | 
+      (t2 = <NUMBER>) 
     )
-  )
+  ) 
   {
     // 获取变量名和值
     String name1 = t1.image;
     String name2 = t2.image;
     float value1 = 0f;
     float value2 = 0f;
-
+    
     if (t1.kind == IDENTIFIER) {
       value1 = variables.getOrDefault(name1, 0f);
     } else {
       value1 = Float.parseFloat(name1);
     }
-
+    
     if (t2.kind == IDENTIFIER) {
       value2 = variables.getOrDefault(name2, 0f);
     } else {
       value2 = Float.parseFloat(name2);
     }
-
+    
     // 根据操作符计算条件结果
     if (op.kind == LESSTHAN) {
       result = value1 < value2;
